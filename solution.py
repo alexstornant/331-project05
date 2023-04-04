@@ -274,62 +274,44 @@ class AVLTree:
         """
         FILL OUT DOCSTRING
         """
-        new_node = Node(val, root, data=data)
-        # inserting into origin
-        if not self.origin:
-            new_node.height = 0
-            self.size += 1
+        new_node = Node(val, parent=root, data=data)
+        if not root:
             self.origin = new_node
+            self.size += 1
             return new_node
-        # inserting into tree
-        # if value is already in tree
-        if root.value == val:
-            return root
-        # search left
-        elif val < root.value:
+        if root.value == val: return root
+        if val < root.value:
             if not root.left:
-                new_node.height = 0
                 root.left = new_node
                 self.size += 1
-                parent_node = root
-                # update parent nodes height
-                while parent_node:
-                    parent_node.height += 1
-                    parent_node = parent_node.parent
-                # re-balance if necessary
-                if new_node.parent and new_node.parent.parent:
-                    return self.rebalance(new_node.parent.parent)
-                return root
-            # otherwise keep searching for spot to insert
-            return self.insert(root.left, val, data)
-        # search right
+            else:
+                self.insert(root.left, val, data)
         else:
             if not root.right:
-                new_node.height = 0
                 root.right = new_node
                 self.size += 1
-                parent_node = root
-                # update parent nodes height
-                while parent_node:
-                    parent_node.height += 1
-                #     parent_node = parent_node.parent
-                # re-balance if necessary
-                if new_node.parent and new_node.parent.parent:
-                    return self.rebalance(new_node.parent.parent)
-                return root
-            return self.insert(root.right, val, data)
+            else:
+                self.insert(root.right, val, data)
+
+        root.height = 1 + max(self.height(root.left), self.height(root.right))
+        new_node.height = 1 + max(self.height(new_node.left), self.height(new_node.right))
+        return self.rebalance(new_node.parent)
 
     def min(self, root: Node) -> Optional[Node]:
         """
         FILL OUT DOCSTRING
         """
-        pass
+        if not root: return None
+        if not root.left: return root
+        return self.min(root.left)
 
     def max(self, root: Node) -> Optional[Node]:
         """
         FILL OUT DOCSTRING
         """
-        pass
+        if not root: return None
+        if not root.right: return root
+        return self.min(root.right)
 
     def search(self, root: Node, val: T) -> Optional[Node]:
         """
@@ -338,14 +320,14 @@ class AVLTree:
         if not root: return None
         if root.value == val:
             return root
-        elif val < root.val:
+        elif val < root.value:
             if not root.left:
                 return root
-            self.search(root.left)
+            return self.search(root.left, val)
         else:
             if not root.right:
                 return root
-            self.search(root.right)
+            return self.search(root.right, val)
 
     def inorder(self, root: Node) -> Generator[Node, None, None]:
         """
@@ -357,7 +339,7 @@ class AVLTree:
         """
         FILL OUT DOCSTRING
         """
-        pass
+        return self.inorder(self.origin)
 
     def preorder(self, root: Node) -> Generator[Node, None, None]:
         """
